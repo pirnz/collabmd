@@ -68,7 +68,7 @@ export function sanitizeVaultPath(vaultDir, requestedPath, { allowIgnored = fals
 
 export function resolveVaultFilePath(vaultDir, requestedPath) {
   const absolute = sanitizeVaultPath(vaultDir, requestedPath);
-  if (!absolute || !isVaultFilePath(absolute)) {
+  if (!absolute) {
     return { absolute: null, error: INVALID_VAULT_FILE_PATH_ERROR };
   }
 
@@ -103,21 +103,8 @@ export function resolveVaultRenamePaths(vaultDir, oldPath, newPath) {
     return { absoluteNew: null, absoluteOld: null, error: 'Invalid file path' };
   }
 
-  if (!isVaultFilePath(absoluteOld)) {
-    return {
-      absoluteNew: null,
-      absoluteOld: null,
-      error: `Old path must be a vault file (${VAULT_FILE_PATH_REQUIREMENT})`,
-    };
-  }
-
-  if (!isVaultFilePath(absoluteNew)) {
-    return {
-      absoluteNew: null,
-      absoluteOld: null,
-      error: `New path must be a vault file (${VAULT_FILE_PATH_REQUIREMENT})`,
-    };
-  }
+  return { absoluteNew, absoluteOld, error: null };
+}
 
   const oldKind = getVaultFileKind(absoluteOld);
   const newKind = getVaultFileKind(absoluteNew);

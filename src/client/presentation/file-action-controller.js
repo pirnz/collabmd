@@ -34,8 +34,6 @@ function formatCount(value, singularLabel, pluralLabel) {
   return `${value} ${value === 1 ? singularLabel : pluralLabel}`;
 }
 
-const VAULT_FILE_PICKER_ACCEPT = VAULT_FILE_EXTENSIONS.join(',');
-
 function createEmptyExcalidrawScene() {
   return JSON.stringify({
     type: 'excalidraw',
@@ -584,7 +582,7 @@ export class FileActionController {
   }
 
   async handleUploadFiles({ parentDir = '' } = {}) {
-    const files = await pickFiles({ accept: VAULT_FILE_PICKER_ACCEPT, multiple: true });
+    const files = await pickFiles({ multiple: true });
     if (files.length === 0) {
       return false;
     }
