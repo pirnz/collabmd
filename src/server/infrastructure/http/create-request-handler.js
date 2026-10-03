@@ -59,7 +59,7 @@ export function createRequestHandler(
       handlers = {
         command: createVaultApiCommandHandler({
           backlinkIndex: parts.backlinkIndex,
-          maxPdfUploadBytes: config.maxPdfUploadBytes,
+          maxUploadSizeBytes: config.maxUploadSizeBytes,
           renderDocx,
           roomRegistry: parts.roomRegistry,
           vaultFileStore: parts.vaultFileStore,

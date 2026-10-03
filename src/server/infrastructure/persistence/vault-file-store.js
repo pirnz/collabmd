@@ -82,6 +82,21 @@ const TEXT_FILE_MIME_TYPES = Object.freeze({
   plantuml: 'text/plain; charset=utf-8',
   structurizr: 'text/plain; charset=utf-8',
 });
+const COMMON_FILE_MIME_TYPES = Object.freeze({
+  '.epub': 'application/epub+zip',
+  '.zip': 'application/zip',
+  '.tar': 'application/x-tar',
+  '.gz': 'application/gzip',
+  '.7z': 'application/x-7z-compressed',
+  '.rar': 'application/vnd.rar',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.txt': 'text/plain; charset=utf-8',
+  '.json': 'application/json; charset=utf-8',
+  '.xml': 'application/xml; charset=utf-8',
+  '.csv': 'text/csv; charset=utf-8',
+});
 
 function createTransactionalPath(targetPath, label) {
   return `${targetPath}.collabmd-${label}-${process.pid}-${Date.now()}-${randomUUID()}`;
@@ -310,7 +325,13 @@ function getDownloadMimeType(filePath) {
     return IMAGE_EXTENSION_TO_MIME_TYPE[extname(String(filePath ?? '')).toLowerCase()] || 'application/octet-stream';
   }
 
-  return TEXT_FILE_MIME_TYPES[fileKind] || 'application/octet-stream';
+  if (fileKind) {
+    return TEXT_FILE_MIME_TYPES[fileKind] || 'application/octet-stream';
+  }
+
+  // Unknown file type - try common extension mapping
+  const extension = extname(String(filePath ?? '')).toLowerCase();
+  return COMMON_FILE_MIME_TYPES[extension] || 'application/octet-stream';
 }
 
 export class VaultFileStore {
@@ -528,7 +549,7 @@ export class VaultFileStore {
 
   async openDownloadFileStream(filePath, { maxBytes = Infinity } = {}) {
     const normalizedPath = String(filePath ?? '').replace(/\\/g, '/').trim();
-    if (!normalizedPath || !isVaultFilePath(normalizedPath)) {
+    if (!normalizedPath) {
       return null;
     }
 

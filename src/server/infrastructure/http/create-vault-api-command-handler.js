@@ -1,5 +1,4 @@
 import { basename } from 'node:path';
-import { isPdfFilePath } from '../../../domain/file-kind.js';
 import { createRequestError } from './http-errors.js';
 import { handleApiError, readRequestId } from './http-request-helpers.js';
 import {
@@ -16,7 +15,6 @@ import {
 
 const DOCX_EXPORT_REQUEST_LIMIT_BYTES = 33_554_432;
 const DOCX_MIME_TYPE = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-const PDF_SIGNATURE = Buffer.from('%PDF-');
 
 function createDocxDownloadHeaders(filePath) {
   const fileName = basename(String(filePath ?? 'document')).replace(/\.[^.]+$/u, '') || 'document';
@@ -135,7 +133,7 @@ async function handleUploadAttachment({ workspaceMutationCoordinator }, req, res
   return true;
 }
 
-async function handleUploadFile({ maxPdfUploadBytes, workspaceMutationCoordinator }, req, res) {
+async function handleUploadFile({ maxUploadSizeBytes, workspaceMutationCoordinator }, req, res) {
   try {
     const filePath = decodeHeaderMetadata(req.headers['x-collabmd-file-path'], 'file upload');
     if (!filePath) {
@@ -148,25 +146,7 @@ async function handleUploadFile({ maxPdfUploadBytes, workspaceMutationCoordinato
       return true;
     }
 
-    const isPdfUpload = isPdfFilePath(filePath);
-    if (isPdfUpload) {
-      const contentType = String(req.headers['content-type'] || '')
-        .split(';', 1)[0]
-        .trim()
-        .toLowerCase();
-      if (contentType !== 'application/pdf') {
-        jsonResponse(req, res, 400, { error: 'PDF uploads must use application/pdf' });
-        return true;
-      }
-    }
-
-    const maxUploadBytes = isPdfUpload ? maxPdfUploadBytes : REQUEST_BODY_LIMIT_BYTES;
-    const content = await readBinaryRequestBody(req, maxUploadBytes);
-    if (isPdfUpload && !content.subarray(0, PDF_SIGNATURE.length).equals(PDF_SIGNATURE)) {
-      jsonResponse(req, res, 400, { error: 'Invalid PDF file' });
-      return true;
-    }
-
+    const content = await readBinaryRequestBody(req, maxUploadSizeBytes);
     const result = await workspaceMutationCoordinator.createFile({
       content,
       path: filePath,
@@ -345,13 +325,13 @@ const ROUTE_TABLE = [
 ];
 
 export function createVaultApiCommandHandler({
-  maxPdfUploadBytes = REQUEST_BODY_LIMIT_BYTES,
+  maxUploadSizeBytes = REQUEST_BODY_LIMIT_BYTES,
   renderDocx = null,
   vaultFileStore,
   workspaceMutationCoordinator = null,
 }) {
   const context = {
-    maxPdfUploadBytes,
+    maxUploadSizeBytes,
     renderDocx,
     vaultFileStore,
     workspaceMutationCoordinator,

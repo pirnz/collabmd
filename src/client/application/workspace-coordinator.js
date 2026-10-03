@@ -1,4 +1,5 @@
 import {
+  getVaultFileKind,
   isBaseFilePath,
   isHtmlFilePath,
   isMarkdownFilePath,
@@ -58,6 +59,7 @@ export class WorkspaceCoordinator {
     onRenderHtmlPreview,
     onRenderImagePreview,
     onRenderPdfPreview,
+    onRenderUnknownPreview,
     onRenderStructurizrPreview,
     onSyncWrapToggle,
     onUpdateActiveFile,
@@ -114,6 +116,7 @@ export class WorkspaceCoordinator {
     this.onRenderHtmlPreview = onRenderHtmlPreview;
     this.onRenderImagePreview = onRenderImagePreview;
     this.onRenderPdfPreview = onRenderPdfPreview;
+    this.onRenderUnknownPreview = onRenderUnknownPreview;
     this.onRenderStructurizrPreview = onRenderStructurizrPreview;
     this.onSyncWrapToggle = onSyncWrapToggle;
     this.onUpdateActiveFile = onUpdateActiveFile;
@@ -193,6 +196,7 @@ export class WorkspaceCoordinator {
     isHtml = false,
     isImage = false,
     isPdf = false,
+    isUnknown = false,
     supportsBacklinks,
   }) {
     if (isCanvas) this.onRenderCanvasPreview(filePath);
@@ -202,6 +206,7 @@ export class WorkspaceCoordinator {
     if (isHtml) this.onRenderHtmlPreview({ content: this.session?.getText?.() ?? '' });
     if (isImage) this.onRenderImagePreview(filePath);
     if (isPdf) this.onRenderPdfPreview(filePath);
+    if (isUnknown) this.onRenderUnknownPreview(filePath);
     if (this.isStructurizrWorkspaceFile(filePath)) {
       this.onRenderStructurizrPreview(filePath, {
         source: this.session?.getText?.() ?? '',
@@ -235,11 +240,12 @@ export class WorkspaceCoordinator {
     const isMermaid = this.isMermaidFile(filePath);
     const isPlantUml = this.isPlantUmlFile(filePath);
     const isStructurizrWorkspace = this.isStructurizrWorkspaceFile(filePath);
+    const isUnknown = !getVaultFileKind(filePath);
 
     if (
       filePath === this.stateStore.currentFilePath
       && normalizedDrawioMode === currentDrawioMode
-      && (this.session || isDrawio || isExcalidraw || isCanvas || isImage || isPdf)
+      && (this.session || isDrawio || isExcalidraw || isCanvas || isImage || isPdf || isUnknown)
     ) {
       this.onUpdateActiveFile(filePath);
       this.onUpdateLobbyCurrentFile(filePath);
@@ -252,11 +258,11 @@ export class WorkspaceCoordinator {
     this.cleanupSession();
     const chromeState = this.prepareForFileOpen(filePath, {
       drawioMode: normalizedDrawioMode,
-      resetConnectionState: !isDrawio && !isExcalidraw && !isImage && !isPdf,
+      resetConnectionState: !isDrawio && !isExcalidraw && !isImage && !isPdf && !isUnknown,
     });
     this.reportFileOpenMetric('open_started', loadToken, { filePath });
 
-    if (isDrawio || isExcalidraw || isCanvas || isImage || isPdf) {
+    if (isDrawio || isExcalidraw || isCanvas || isImage || isPdf || isUnknown) {
       this.onSessionAssigned?.(null);
 
       if (loadToken !== this.stateStore.sessionLoadToken) {
@@ -272,6 +278,7 @@ export class WorkspaceCoordinator {
         isExcalidraw,
         isImage,
         isPdf,
+        isUnknown,
         session: null,
         supportsBacklinks: chromeState.supportsBacklinks,
       });

@@ -1,4 +1,5 @@
 import { PdfPreviewController } from '../application/pdf-preview-controller.js';
+import { UnknownFileViewController } from '../application/unknown-file-view-controller.js';
 import { analyzeMarkdownComplexity, isLargeDocumentStats } from '../application/preview-render-profile.js';
 import { PreviewRenderer } from '../application/preview-renderer.js';
 import { renderWebMcpDiagram } from '../application/webmcp-diagram-renderer.js';
@@ -412,6 +413,7 @@ export class CollabMdAppShell {
     this.pdfPreview = new PdfPreviewController({
       getTheme: () => this.themeController.getTheme(),
     });
+    this.unknownFileView = new UnknownFileViewController();
     this.backlinksPanel = new BacklinksPanel({
       headerPanelElement: this.elements.backlinksHeaderPanel,
       inlinePanelElement: this.elements.backlinksInlinePanel,
@@ -521,6 +523,7 @@ export class CollabMdAppShell {
       pdfPreview: this.pdfPreview,
       previewRenderer: this.previewRenderer,
       scrollSyncController: this.scrollSyncController,
+      unknownFileView: this.unknownFileView,
       videoEmbed: this.videoEmbed,
     });
     this.wikiLinkFileController = new WikiLinkFileController({
@@ -702,6 +705,7 @@ export class CollabMdAppShell {
       onRenderHtmlPreview: (options) => this.workspacePreviewController.renderHtmlFilePreview(options),
       onRenderImagePreview: (filePath) => this.workspacePreviewController.renderImageFilePreview(filePath),
       onRenderPdfPreview: (filePath) => this.workspacePreviewController.renderPdfFilePreview(filePath),
+      onRenderUnknownPreview: (filePath) => this.workspacePreviewController.renderUnknownFilePreview(filePath),
       onRenderStructurizrPreview: (filePath, options) => this.workspacePreviewController.renderStructurizrFilePreview(filePath, options),
       onSyncWrapToggle: () => this.syncWrapToggle(),
       onUpdateActiveFile: (filePath) => this.fileExplorer.setActiveFile(filePath),

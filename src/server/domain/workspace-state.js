@@ -185,9 +185,6 @@ export async function scanWorkspaceState(adapter, {
       }
 
       if (direntKind === 'file') {
-        if (!isVaultFilePath(relativePath)) {
-          return;
-        }
         entries.set(relativePath, createWorkspaceEntry(relativePath, 'file'));
         const info = await readWorkspaceStat(adapter, relativePath);
         if (info) {
@@ -206,7 +203,7 @@ export async function scanWorkspaceState(adapter, {
         await visitDirectory(relativePath);
         return;
       }
-      if (isFileStat(info) && isVaultFilePath(relativePath)) {
+      if (isFileStat(info)) {
         entries.set(relativePath, createWorkspaceEntry(relativePath, 'file'));
         metadata.set(relativePath, createWorkspaceMetadata(relativePath, 'file', info));
       }
@@ -251,7 +248,7 @@ export async function readWorkspacePathState(adapter, pathValue, {
     };
   }
 
-  if (!isFileStat(info) || !isVaultFilePath(normalizedPath)) {
+  if (!isFileStat(info)) {
     return null;
   }
 
@@ -303,10 +300,6 @@ export async function readWorkspacePathSnapshot(adapter, pathValue) {
           continue;
         }
 
-        if (direntKind === 'file' && !isVaultFilePath(childRelativePath)) {
-          continue;
-        }
-
         const childInfo = await readWorkspaceStat(adapter, childRelativePath);
         if (!childInfo) {
           continue;
@@ -317,7 +310,7 @@ export async function readWorkspacePathSnapshot(adapter, pathValue) {
           continue;
         }
 
-        if (!isFileStat(childInfo) || !isVaultFilePath(childRelativePath)) {
+        if (!isFileStat(childInfo)) {
           continue;
         }
 
@@ -330,7 +323,7 @@ export async function readWorkspacePathSnapshot(adapter, pathValue) {
     return { entries, metadata };
   }
 
-  if (!isFileStat(info) || !isVaultFilePath(normalizedPath)) {
+  if (!isFileStat(info)) {
     return { entries, metadata };
   }
 

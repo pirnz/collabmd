@@ -1,4 +1,5 @@
 import {
+  getVaultFileKind,
   isBaseFilePath,
   isCanvasFilePath,
   isDiagramFilePath,
@@ -59,6 +60,7 @@ export class WorkspacePreviewController {
     pdfPreview = null,
     scrollSyncController,
     structurizrPreview = null,
+    unknownFileView = null,
     videoEmbed,
   }) {
     this.backlinksPanel = backlinksPanel;
@@ -96,6 +98,7 @@ export class WorkspacePreviewController {
     this.outlineController = outlineController;
     this.previewRenderer = previewRenderer;
     this.pdfPreview = pdfPreview ?? { cancel() {}, render() {} };
+    this.unknownFileView = unknownFileView ?? { cancel() {}, render() {} };
     this.previewHydrationPaused = false;
     this.pendingPreviewLayoutSync = false;
     this.previewLayoutSyncTimer = null;
@@ -150,12 +153,14 @@ export class WorkspacePreviewController {
     this.setHtmlPreviewMaximized(false);
     this.htmlPreviewShell = null;
     this.pdfPreview.cancel();
+    this.unknownFileView.cancel();
     this.elements.previewContent?.classList.remove('is-drawio-file-preview');
     this.elements.previewContent?.classList.remove('is-excalidraw-file-preview');
     this.elements.previewContent?.classList.remove('is-canvas-file-preview');
     this.elements.previewContent?.classList.remove('is-base-file-preview');
     this.elements.previewContent?.classList.remove('is-image-file-preview');
     this.elements.previewContent?.classList.remove('is-pdf-file-preview');
+    this.elements.previewContent?.classList.remove('is-unknown-file-preview');
     this.elements.previewContent?.classList.remove('is-html-file-preview');
     this.elements.previewContent?.classList.remove('is-mermaid-file-preview');
     this.elements.previewContent?.classList.remove('is-plantuml-file-preview');
@@ -170,6 +175,7 @@ export class WorkspacePreviewController {
     const isBase = this.isBaseFile(filePath);
     const isImage = this.isImageFile(filePath);
     const isPdf = this.isPdfFile(filePath);
+    const isUnknown = !getVaultFileKind(filePath);
     const isHtml = isHtmlFilePath(filePath);
     const isMarkdown = isMarkdownFilePath(filePath);
     const isMermaid = this.isMermaidFile(filePath);
@@ -198,7 +204,7 @@ export class WorkspacePreviewController {
       this.backlinksPanel.clear();
     }
 
-    if ((isDrawio && drawioMode !== 'text') || isExcalidraw || isCanvas || isHtml || isImage || isPdf || (isBase && preferPreviewForBase)) {
+    if ((isDrawio && drawioMode !== 'text') || isExcalidraw || isCanvas || isHtml || isImage || isPdf || isUnknown || (isBase && preferPreviewForBase)) {
       this.layoutController.setView('preview', { persist: false });
       this.outlineController.close();
       this.backlinksPanel.clear();
@@ -335,6 +341,28 @@ export class WorkspacePreviewController {
 
     if (renderHost) {
       this.pdfPreview.render({
+        filePath,
+        renderHost,
+      });
+      renderHost.style.minHeight = '';
+    }
+
+    previewElement.dataset.renderPhase = 'ready';
+    this.outlineController.close();
+    this.backlinksPanel.clear();
+    this.scrollSyncController.setLargeDocumentMode(false);
+    this.scrollSyncController.invalidatePreviewBlocks();
+    this.videoEmbed?.reconcileEmbeds(previewElement);
+    this.schedulePreviewLayoutSync({ delayMs: 0 });
+  }
+
+  renderUnknownFilePreview(filePath) {
+    const preview = this.prepareFilePreview('is-unknown-file-preview');
+    if (!preview) return;
+    const { previewElement, renderHost } = preview;
+
+    if (renderHost) {
+      this.unknownFileView.render({
         filePath,
         renderHost,
       });

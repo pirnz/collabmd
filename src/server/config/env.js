@@ -15,7 +15,7 @@ import { isPerfLoggingEnabled } from './perf-logging.js';
 
 const DEFAULT_SEARCH_MAX_BUFFER_BYTES = 2 * 1024 * 1024;
 const DEFAULT_SEARCH_MAX_FILE_SIZE = '1M';
-const DEFAULT_PDF_UPLOAD_BYTES = 50 * 1024 * 1024;
+const DEFAULT_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
 
 function parsePositiveInt(rawValue, fallbackValue) {
   const parsed = Number.parseInt(rawValue ?? '', 10);
@@ -635,9 +635,9 @@ export function loadConfig(overrides = {}) {
     maxBaseQueryRows: parsePositiveInt(process.env.COLLABMD_MAX_BASE_QUERY_ROWS, 5_000),
     maxDownloadFileBytes: parsePositiveInt(process.env.COLLABMD_MAX_DOWNLOAD_FILE_BYTES, 268_435_456),
     maxInitialSyncBytes: parsePositiveInt(process.env.COLLABMD_MAX_INITIAL_SYNC_BYTES, 16_777_216),
-    maxPdfUploadBytes: parsePositiveInt(
-      overrides.maxPdfUploadBytes ?? process.env.COLLABMD_MAX_PDF_UPLOAD_BYTES,
-      DEFAULT_PDF_UPLOAD_BYTES,
+    maxUploadSizeBytes: parsePositiveInt(
+      overrides.maxUploadSizeBytes ?? process.env.COLLABMD_MAX_UPLOAD_SIZE_BYTES,
+      DEFAULT_UPLOAD_SIZE_BYTES,
     ),
     searchMaxBufferBytes: parsePositiveInt(
       overrides.searchMaxBufferBytes ?? process.env.COLLABMD_SEARCH_MAX_BUFFER_BYTES,

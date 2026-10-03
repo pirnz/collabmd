@@ -105,7 +105,7 @@ export function getVaultFileKind(filePath) {
 export function getVaultTreeNodeType(filePath) {
   const kind = getVaultFileKind(filePath);
   if (!kind) {
-    return null;
+    return 'unknown';
   }
 
   if (kind === 'image') {
@@ -182,6 +182,31 @@ export function isVaultFilePath(filePath) {
   return getVaultFileKind(filePath) !== null;
 }
 
+export function isRecognizedVaultFilePath(filePath) {
+  return getVaultFileKind(filePath) !== null;
+}
+
+export function supportsPreviewForFilePath(filePath) {
+  return getVaultFileKind(filePath) !== null;
+}
+
+export function supportsEditingForFilePath(filePath) {
+  const kind = getVaultFileKind(filePath);
+  return kind === 'markdown'
+    || kind === 'html'
+    || kind === 'base'
+    || kind === 'mermaid'
+    || kind === 'plantuml'
+    || kind === 'structurizr'
+    || kind === 'excalidraw'
+    || kind === 'canvas'
+    || kind === 'drawio';
+}
+
+export function supportsDownloadForFilePath(filePath) {
+  return true;
+}
+
 export function supportsCommentsForFilePath(filePath) {
   const kind = getVaultFileKind(filePath);
   return kind === 'markdown'
@@ -192,7 +217,7 @@ export function supportsCommentsForFilePath(filePath) {
 }
 
 export function supportsBacklinksForFilePath(filePath) {
-  return isVaultFilePath(filePath);
+  return isRecognizedVaultFilePath(filePath);
 }
 
 export function stripVaultFileExtension(name) {

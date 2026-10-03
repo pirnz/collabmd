@@ -1,0 +1,79 @@
+/* Unknown File View */
+.unknown-file-view {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--color-background);
+}
+
+.unknown-file-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 32px;
+  text-align: center;
+  max-width: 400px;
+}
+
+.unknown-file-icon {
+  width: 64px;
+  height: 64px;
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+}
+
+.unknown-file-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.unknown-file-name {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 500;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.unknown-file-type {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.unknown-file-message {
+  margin: 0;
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.unknown-file-download-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  margin-top: 8px;
+  background-color: var(--color-primary);
+  color: var(--color-button-text);
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.unknown-file-download-button:hover {
+  background-color: var(--color-primary-hover);
+}
+
+.unknown-file-download-button:active {
+  background-color: var(--color-primary-active);
+}
