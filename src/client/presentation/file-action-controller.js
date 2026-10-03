@@ -556,8 +556,8 @@ export class FileActionController {
     for (const file of Array.from(files ?? [])) {
       const fileName = getVaultPathLeaf(file?.name);
       const filePath = composeVaultChildPath(normalizedParentDir, fileName);
-      if (!fileName || !isVaultFilePath(filePath)) {
-        this.showToast(`Unsupported file type: ${fileName || 'unnamed file'}`);
+      if (!fileName) {
+        this.showToast('Invalid file name');
         continue;
       }
 

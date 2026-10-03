@@ -60,20 +60,23 @@
   padding: 10px 20px;
   margin-top: 8px;
   background-color: var(--color-primary);
-  color: var(--color-text-inverse);
+  color: white;
   border: none;
   border-radius: 6px;
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color 0.15s, transform 0.1s;
+  box-shadow: var(--shadow-sm);
 }
 
 .unknown-file-download-button:hover {
   background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
 }
 
 .unknown-file-download-button:active {
   background-color: var(--color-primary-active);
+  transform: scale(0.97);
 }
