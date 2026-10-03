@@ -103,9 +103,6 @@ export function resolveVaultRenamePaths(vaultDir, oldPath, newPath) {
     return { absoluteNew: null, absoluteOld: null, error: 'Invalid file path' };
   }
 
-  return { absoluteNew, absoluteOld, error: null };
-}
-
   const oldKind = getVaultFileKind(absoluteOld);
   const newKind = getVaultFileKind(absoluteNew);
   if (oldKind !== newKind && [oldKind, newKind].includes('canvas')) {
